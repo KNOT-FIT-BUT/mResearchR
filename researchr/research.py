@@ -1,6 +1,5 @@
 import json
 import httplib
-import sys
 
 class ResearchClass:
     def __init__(self):
@@ -36,7 +35,7 @@ class ResearchClass:
             try:
                 int(index)
             except:
-                print "Druhy parametr musi byt cislo"
+                print "Second parametr must be number."
                 return
         try:
             self.conn = httplib.HTTPConnection("researchr.org")
@@ -60,6 +59,6 @@ class ResearchClass:
         try:
             return json.loads(data.decode(self.encoding))
         except:
-	    print "Nastala chyba pri nacitani json."
+	    print "An error occurred when json was loaded."
 	    return
         
