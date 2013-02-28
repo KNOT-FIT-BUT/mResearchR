@@ -1,16 +1,16 @@
 import json
 import httplib
 
-class ResearchClass:
+class ResearchrClass:
     def __init__(self):
         self.conn = None
 	self.encoding = "UTF-8"
         
-    def searchPublication(self, key, index):
+    def searchPublications(self, key, index):
         data = self.makeRequest("search/publication", key, index)
 	return self.decode(data)
 
-    def searchConference(self, key, index):
+    def searchConferences(self, key, index):
         data = self.makeRequest("search/conference", key, index)
 	return self.decode(data)
         
@@ -37,28 +37,16 @@ class ResearchClass:
             except:
                 print "Second parametr must be number."
                 return
-        try:
-            self.conn = httplib.HTTPConnection("researchr.org")
-            self.conn.request("GET", "/api/%s/%s/%s" % (term, key, index))
-            print "/api/%s/%s/%s" % (term, key, index)
-        except:
-            print "Nastala chyba pri ziskavani dat z webu."
-            return
-        try:
-            res = self.conn.getresponse()
-        except:
-            print "Nastala chyba pri ziskavani dat z webu."
-            return
+        self.conn = httplib.HTTPConnection("researchr.org")
+        self.conn.request("GET", "/api/%s/%s/%s" % (term, key, index))
+        res = self.conn.getresponse()
         if res.status != 200:
-            print "Odeslany pozadavek vratil chybu: %s" % res.reason
+            print "Page return error code %d: %s" % (res.status, res.reason)
             return
         data = res.read()
         return data
 		
     def decode(self, data):
-        try:
-            return json.loads(data.decode(self.encoding))
-        except:
-	    print "An error occurred when json was loaded."
-	    return
+        self.conn.close()
+        return json.loads(data.decode(self.encoding))
         
