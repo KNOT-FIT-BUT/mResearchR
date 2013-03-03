@@ -3,11 +3,11 @@ mResearchR
 
 Python API module for ResearchR.org
 
-TRY IT
+**Try it**
 
 In ./bin/example/ you can find example app using researchr.py module.
 
-ABOUT
+**About**
 
 Module have one class "ResearchrClass", this class have these methods:
 
@@ -18,9 +18,9 @@ searchPublications return dictionary.
 - index: page of results (101 results on page)
 
 using: 
-publications = r.searchPublications("web+service",0)
+ publications = r.searchPublications("web+service",0)
 
-for more information: https://merlin.fit.vutbr.cz/nlp-wiki/index.php/Rrs_researchr#Vyhled.C3.A1v.C3.A1n.C3.AD
+for more information: *https://merlin.fit.vutbr.cz/nlp-wiki/index.php/Rrs_researchr#Vyhled.C3.A1v.C3.A1n.C3.AD*
 
 
 
@@ -32,6 +32,6 @@ searchConferences return dictionary.
 - index: page of results (101 results on page)
 
 using: 
-conferences = r.searchConferences("web+service",0)
+ conferences = r.searchConferences("web+service",0)
 
-for more information: https://merlin.fit.vutbr.cz/nlp-wiki/index.php/Rrs_researchr#Vyhled.C3.A1v.C3.A1n.C3.AD
+for more information: *https://merlin.fit.vutbr.cz/nlp-wiki/index.php/Rrs_researchr#Vyhled.C3.A1v.C3.A1n.C3.AD*
