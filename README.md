@@ -11,7 +11,7 @@ ABOUT
 
 Module have one class "ResearchrClass", this class have these methods:
 
-searchPublications(key, index) - for search publications on researchr.org
+**searchPublications(key, index)** - for search publications on researchr.org
 searchPublications return dictionary.
 
 - key: search term
@@ -25,7 +25,7 @@ for more information: https://merlin.fit.vutbr.cz/nlp-wiki/index.php/Rrs_researc
 
 
 
-searchConferences(key, index) - for search conferences on researchr.org
+**searchConferences(key, index)** - for search conferences on researchr.org
 searchConferences return dictionary.
 
 - key: search term
