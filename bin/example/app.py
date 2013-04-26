@@ -3,7 +3,7 @@ import researchr
 from researchr import *
 
 r = ResearchrClass()
-
+"""
 #getPerson example:
 print("getPerson(\"eelcovisser\")")
 person = r.getPerson("eelcovisser")
@@ -66,9 +66,9 @@ print "\n"
 print "searchConferences(\"web+service\",3)"
 print "Page %s:" % conferencesPage3["index"]
 print "Number of results: %s" % len(conferencesPage3["result"])
-
+"""
 print "TEST GetPublicationsNames"
-print "r.GetPublicationsNames(self, \"testFile.txt\", \"\")"
-r.GetPublicationsNames("testFile.txt", "")
-print "r.GetPublicationsNames(self, \"testFileY.txt\", \"Y\")"
-r.GetPublicationsNames("testFileY.txt", "Y")
+print "r.getPublicationsNames(self, \"testFile.txt\", \"\")"
+r.getPublicationsNames("testFile.txt", "")
+print "r.getPublicationsNames(self, \"testFileY.txt\", \"Y\")"
+r.getPublicationsNames("testFileY.txt", "Y")
