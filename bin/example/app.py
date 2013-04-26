@@ -67,3 +67,8 @@ print "searchConferences(\"web+service\",3)"
 print "Page %s:" % conferencesPage3["index"]
 print "Number of results: %s" % len(conferencesPage3["result"])
 
+print "TEST GetPublicationsNames"
+print "r.GetPublicationsNames(self, \"testFile.txt\", \"\")"
+r.GetPublicationsNames("testFile.txt", "")
+print "r.GetPublicationsNames(self, \"testFileY.txt\", \"Y\")"
+r.GetPublicationsNames("testFileY.txt", "Y")
