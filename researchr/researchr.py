@@ -1,6 +1,9 @@
 import json
 # -*- coding: utf-8 -*-
 import httplib
+import random
+import time
+import re
 from exceptions import *
 
 
@@ -14,6 +17,7 @@ class ResearchrClass:
         self.secondLimitMax = 100
         self.thirdLimitMin = 500
         self.thirdLimitMax = 600
+        self.filename = None
         self.userAgents = ["Mozilla/5.0 (X11; Linux i686) AppleWebKit/535.1 (KHTML, like Gecko) Ubuntu/11.04 Chromium/14.0.825.0 Chrome/14.0.825.0 Safari/535.1",
                            "Mozilla/5.0 (X11; U; Linux x86_64; en-US) AppleWebKit/532.0 (KHTML, like Gecko) Chrome/4.0.204.0 Safari/532.0",
                            "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)",
@@ -145,19 +149,19 @@ class ResearchrClass:
             if "/explore/authors/1/" in url and "researchr.org/" not in url and url not in rootUrl:
                 print("Nasel jsem dalsi uroven: %s" % url)
                 refFound = 1
-                urls = getUrlsFromPage(url)
-                self.searchUsefulUrls(urls, url)
+                urls = self.__getUrlsFromPage(url)
+                self.__searchUsefulUrls(urls, url)
 
             # search for people
             elif "/alias/" in url and "advised" not in url and "researchr.org/" not in url and "/alias/" not in rootUrl and refFound == 0:
                 print("Nasel jsme alias: %s" % url)
-                urls = getUrlsFromPage(url)
-                self.searchUsefulUrls(urls, url)
+                urls = self.__getUrlsFromPage(url)
+                self.__searchUsefulUrls(urls, url)
 
             # search for publications
             elif "/publication/" in url and "researchr.org/" not in url:
                 print("Nasel jsem publikaci: %s" % url)
-                with open(filename, "ab") as myFile:
+                with open(self.filename, "ab") as myFile:
                     myFile.write(url.replace("/publication/","")+ ";")
 
     def __getUrlsFromPage(self,url):
@@ -204,5 +208,6 @@ class ResearchrClass:
         @type  mainLetter: string
         @param mainLetter: First letter of authors from which we will find their publications.
         """
+        self.filename = filename
         for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-            self.searchUsefulUrls(self.getUrlsFromPage("/explore/authors/1/%s%s" % (mainLetter,letter)),"/explore/authors/1/%s%s" % (mainLetter,letter))
+            self.__searchUsefulUrls(self.__getUrlsFromPage("/explore/authors/1/%s%s" % (mainLetter,letter)),"/explore/authors/1/%s%s" % (mainLetter,letter))

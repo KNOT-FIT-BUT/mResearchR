@@ -1,5 +1,9 @@
 import json
+# -*- coding: utf-8 -*-
 import httplib
+import random
+import time
+import re
 from exceptions import *
 
 
@@ -7,7 +11,27 @@ class ResearchrClass:
     def __init__(self):
         self.conn = None
         self.encoding = "UTF-8"
-	
+        self.firstLimitMin = 0.9
+        self.firstLimitMax = 2.5
+        self.secondLimitMin = 70
+        self.secondLimitMax = 100
+        self.thirdLimitMin = 500
+        self.thirdLimitMax = 600
+        self.filename = None
+        self.userAgents = ["Mozilla/5.0 (X11; Linux i686) AppleWebKit/535.1 (KHTML, like Gecko) Ubuntu/11.04 Chromium/14.0.825.0 Chrome/14.0.825.0 Safari/535.1",
+                           "Mozilla/5.0 (X11; U; Linux x86_64; en-US) AppleWebKit/532.0 (KHTML, like Gecko) Chrome/4.0.204.0 Safari/532.0",
+                           "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)",
+                           "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 7.1; Trident/5.0)",
+                           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_7) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.790.0 Safari/535.1",
+                           "Opera/6.01 (Windows XP; U) [de]",
+                           "Opera/9.80 (Windows NT 5.2; U; en) Presto/2.6.30 Version/10.63",
+                           "Mozilla/4.0 (compatible; MSIE 6.0; Windows 98; de) Opera 8.02",
+                           "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0) Opera 7.50 [en]",
+                           "Mozilla/5.0 (Windows; U; Windows NT 6.1; ru; rv:1.9.2b5) Gecko/20091204 Firefox/3.6b5",
+                           "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1",
+                           "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.60 Safari/537.17"
+                            ]
+        
     def searchPublications(self, key, index):
         """
         Search publications on researchr.org.
@@ -47,7 +71,7 @@ class ResearchrClass:
         """
         data = self.__makeRequest("publication", key, "")
         return self.__decode(data)
-			
+            
     def getPerson(self, key):
         """
         Get the person (author) from researchr.org.
@@ -95,7 +119,7 @@ class ResearchrClass:
             raise HTTPStatusException("Page return error code %d: %s" % (res.status, res.reason))
         data = res.read()
         return data
-		
+        
     def __decode(self, data):
         """
         Decode data.
@@ -125,19 +149,19 @@ class ResearchrClass:
             if "/explore/authors/1/" in url and "researchr.org/" not in url and url not in rootUrl:
                 print("Nasel jsem dalsi uroven: %s" % url)
                 refFound = 1
-                urls = getUrlsFromPage(url)
-                self.searchUsefulUrls(urls, url)
+                urls = self.__getUrlsFromPage(url)
+                self.__searchUsefulUrls(urls, url)
 
             # search for people
             elif "/alias/" in url and "advised" not in url and "researchr.org/" not in url and "/alias/" not in rootUrl and refFound == 0:
                 print("Nasel jsme alias: %s" % url)
-                urls = getUrlsFromPage(url)
-                self.searchUsefulUrls(urls, url)
+                urls = self.__getUrlsFromPage(url)
+                self.__searchUsefulUrls(urls, url)
 
             # search for publications
             elif "/publication/" in url and "researchr.org/" not in url:
                 print("Nasel jsem publikaci: %s" % url)
-                with open(filename, "ab") as myFile:
+                with open(self.filename, "ab") as myFile:
                     myFile.write(url.replace("/publication/","")+ ";")
 
     def __getUrlsFromPage(self,url):
@@ -150,33 +174,20 @@ class ResearchrClass:
         @return: List of urls.
         """
         req = urllib2.Request("http://researchr.org%s" % url)
-        userAgents = ["Mozilla/5.0 (X11; Linux i686) AppleWebKit/535.1 (KHTML, like Gecko) Ubuntu/11.04 Chromium/14.0.825.0 Chrome/14.0.825.0 Safari/535.1",
-                           "Mozilla/5.0 (X11; U; Linux x86_64; en-US) AppleWebKit/532.0 (KHTML, like Gecko) Chrome/4.0.204.0 Safari/532.0",
-                           "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)",
-                           "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 7.1; Trident/5.0)",
-                           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_7) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.790.0 Safari/535.1",
-                           "Opera/6.01 (Windows XP; U) [de]",
-                           "Opera/9.80 (Windows NT 5.2; U; en) Presto/2.6.30 Version/10.63",
-                           "Mozilla/4.0 (compatible; MSIE 6.0; Windows 98; de) Opera 8.02",
-                           "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0) Opera 7.50 [en]",
-                           "Mozilla/5.0 (Windows; U; Windows NT 6.1; ru; rv:1.9.2b5) Gecko/20091204 Firefox/3.6b5",
-                           "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1",
-                           "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.60 Safari/537.17"
-                            ]
-        req.add_header('User-agent', userAgents[random.randint(0, 11)])
+        req.add_header('User-agent', self.userAgents[random.randint(0, 11)])
         try:
             resp = urllib2.urlopen(req)                                                                          
         except:
             try:
-                time.sleep(random.uniform(70, 100))
+                time.sleep(random.uniform(self.secondLimitMin, self.secondLimitMax))
                 req = urllib2.Request("http://researchr.org%s" % url)
-                req.add_header('User-agent', userAgents[random.randint(0, 11)])
+                req.add_header('User-agent', self.userAgents[random.randint(0, 11)])
                 resp = urllib2.urlopen(req)
             except:
-                time.sleep(random.uniform(500, 600))
+                time.sleep(random.uniform(self.thirdLimitMin, self.thirdLimitMax))
                 try:
                     req = urllib2.Request("http://researchr.org%s" % url)
-                    req.add_header('User-agent', userAgents[random.randint(0, 11)])
+                    req.add_header('User-agent', self.userAgents[random.randint(0, 11)])
                     resp = urllib2.urlopen(req)
                 except:
                     print("Error in url: %s" % url)
@@ -184,7 +195,7 @@ class ResearchrClass:
             content = resp.read()
         except:
             print("Error in url: %s" % url)
-        time.sleep(random.uniform(0.9, 2.5))
+        time.sleep(random.uniform(self.firstLimitMin, self.firstLimitMax))
         urls = re.findall('/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', content)
         return urls
     
@@ -197,5 +208,6 @@ class ResearchrClass:
         @type  mainLetter: string
         @param mainLetter: First letter of authors from which we will find their publications.
         """
+        self.filename = filename
         for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-            self.searchUsefulUrls(self.getUrlsFromPage("/explore/authors/1/%s%s" % (mainLetter,letter)),"/explore/authors/1/%s%s" % (mainLetter,letter))
+            self.__searchUsefulUrls(self.__getUrlsFromPage("/explore/authors/1/%s%s" % (mainLetter,letter)),"/explore/authors/1/%s%s" % (mainLetter,letter))
